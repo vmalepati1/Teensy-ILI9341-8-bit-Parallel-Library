@@ -31,28 +31,33 @@ void WR_STROBE() {WR_ACTIVE; WR_IDLE;}
 void swap(int16_t a, int16_t b) {int16_t t = a; a = b; b = t;}
 
 void write8special(uint8_t c) {
+	
 
-  for (uint8_t b = 0; b < 8; b++) {
 
-	  if (bitRead(c, b)) {
-
-		  digitalWriteFast(D0 + b, HIGH);
-
-	  } else {
-
-		  digitalWriteFast(D0 + b, LOW);
-
-	  }
-
-  }
+	digitalWriteFast(D0, bitRead(c, 0) ? HIGH: LOW);
+	digitalWriteFast(D1, bitRead(c, 1) ? HIGH: LOW);
+	digitalWriteFast(D2, bitRead(c, 2) ? HIGH: LOW);
+	digitalWriteFast(D3, bitRead(c, 3) ? HIGH: LOW);
+	digitalWriteFast(D4, bitRead(c, 4) ? HIGH: LOW);
+	digitalWriteFast(D5, bitRead(c, 5) ? HIGH: LOW);
+	digitalWriteFast(D6, bitRead(c, 6) ? HIGH: LOW);
+	digitalWriteFast(D7, bitRead(c, 7) ? HIGH: LOW);
 
 
 
   //TFT_DATA->regs->ODR = ((TFT_DATA->regs->ODR & 0xFF00) | ((c) & 0x00FF));//FF00 is Binary 1111111100000000
 
 
-
   WR_STROBE();
+  
+  	digitalWriteFast(D0, LOW);
+	digitalWriteFast(D1, LOW);
+	digitalWriteFast(D2, LOW);
+	digitalWriteFast(D3, LOW);
+	digitalWriteFast(D4, LOW);
+	digitalWriteFast(D5, LOW);
+	digitalWriteFast(D6, LOW);
+	digitalWriteFast(D7, LOW);
 
 }
 
@@ -256,19 +261,14 @@ void Adafruit_ILI9341_8bit_STM::write8(uint8_t c) {
 
 
 
-  for (uint8_t b = 0; b < 8; b++) {
-
-	  if (bitRead(c, b)) {
-
-		  digitalWriteFast(D0 + b, HIGH);
-
-	  } else {
-
-		  digitalWriteFast(D0 + b, LOW);
-
-	  }
-
-  }
+	digitalWriteFast(D0, bitRead(c, 0) ? HIGH: LOW);
+	digitalWriteFast(D1, bitRead(c, 1) ? HIGH: LOW);
+	digitalWriteFast(D2, bitRead(c, 2) ? HIGH: LOW);
+	digitalWriteFast(D3, bitRead(c, 3) ? HIGH: LOW);
+	digitalWriteFast(D4, bitRead(c, 4) ? HIGH: LOW);
+	digitalWriteFast(D5, bitRead(c, 5) ? HIGH: LOW);
+	digitalWriteFast(D6, bitRead(c, 6) ? HIGH: LOW);
+	digitalWriteFast(D7, bitRead(c, 7) ? HIGH: LOW);
 
 
   //TFT_DATA->regs->ODR = ((TFT_DATA->regs->ODR & 0xFF00) | ((c) & 0x00FF));//FF00 is Binary 1111111100000000
@@ -276,6 +276,15 @@ void Adafruit_ILI9341_8bit_STM::write8(uint8_t c) {
 
 
   WR_STROBE();
+  
+  	digitalWriteFast(D0, LOW);
+	digitalWriteFast(D1, LOW);
+	digitalWriteFast(D2, LOW);
+	digitalWriteFast(D3, LOW);
+	digitalWriteFast(D4, LOW);
+	digitalWriteFast(D5, LOW);
+	digitalWriteFast(D6, LOW);
+	digitalWriteFast(D7, LOW);
 
 
 
