@@ -450,35 +450,35 @@ Define pins and Output Data Registers
 
 
 
-#define RD_IDLE    digitalWriteFast(TFT_RD, HIGH);
+#define RD_IDLE    digitalWriteFast(TFT_RD, HIGH)
 
 
 
-#define RD_ACTIVE      digitalWriteFast(TFT_RD, LOW);
+#define RD_ACTIVE      digitalWriteFast(TFT_RD, LOW)
 
 
 
-#define WR_IDLE    digitalWriteFast(TFT_WR, HIGH);
+#define WR_IDLE    digitalWriteFast(TFT_WR, HIGH)
 
 
 
-#define WR_ACTIVE      digitalWriteFast(TFT_WR, LOW);
+#define WR_ACTIVE      digitalWriteFast(TFT_WR, LOW)
 
 
 
-#define CD_COMMAND   digitalWriteFast(TFT_RS, LOW);
+#define CD_COMMAND   digitalWriteFast(TFT_RS, LOW)
 
 
 
-#define CD_DATA      digitalWriteFast(TFT_RS, HIGH);
+#define CD_DATA      digitalWriteFast(TFT_RS, HIGH)
 
 
 
-#define CS_IDLE    digitalWriteFast(TFT_CS, HIGH);
+#define CS_IDLE    digitalWriteFast(TFT_CS, HIGH)
 
 
 
-#define CS_ACTIVE      digitalWriteFast(TFT_CS, LOW);
+#define CS_ACTIVE      digitalWriteFast(TFT_CS, LOW)
 
 #define D0 15
 #define D1 22
@@ -610,9 +610,6 @@ class Adafruit_ILI9341_8bit_STM : public Adafruit_GFX {
 
 
 
-
-
- private:
 
 
 
