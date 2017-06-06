@@ -34,14 +34,8 @@ void write8special(uint8_t c) {
 	
 
 
-	digitalWriteFast(D0, bitRead(c, 0) ? HIGH: LOW);
-	digitalWriteFast(D1, bitRead(c, 1) ? HIGH: LOW);
-	digitalWriteFast(D2, bitRead(c, 2) ? HIGH: LOW);
-	digitalWriteFast(D3, bitRead(c, 3) ? HIGH: LOW);
-	digitalWriteFast(D4, bitRead(c, 4) ? HIGH: LOW);
-	digitalWriteFast(D5, bitRead(c, 5) ? HIGH: LOW);
-	digitalWriteFast(D6, bitRead(c, 6) ? HIGH: LOW);
-	digitalWriteFast(D7, bitRead(c, 7) ? HIGH: LOW);
+	GPIOC_PSOR = c;
+	GPIOC_PCOR = ~c;
 
 
 
@@ -50,14 +44,7 @@ void write8special(uint8_t c) {
 
   WR_STROBE();
   
-  	digitalWriteFast(D0, LOW);
-	digitalWriteFast(D1, LOW);
-	digitalWriteFast(D2, LOW);
-	digitalWriteFast(D3, LOW);
-	digitalWriteFast(D4, LOW);
-	digitalWriteFast(D5, LOW);
-	digitalWriteFast(D6, LOW);
-	digitalWriteFast(D7, LOW);
+	GPIOC_PCOR = 0b11111111;
 
 }
 
@@ -171,15 +158,20 @@ void Adafruit_ILI9341_8bit_STM::setWriteDataBus(void) {
 
   // not required to mask and assign, because all pins of bus are set together
 
-	pinMode(D0, OUTPUT);
-	pinMode(D1, OUTPUT);
-	pinMode(D2, OUTPUT);
-	pinMode(D3, OUTPUT);
-	pinMode(D4, OUTPUT);
-	pinMode(D5, OUTPUT);
-	pinMode(D6, OUTPUT);
-	pinMode(D7, OUTPUT);
-
+	PORTC_PCR0 = PORT_PCR_MUX(0x1);
+	PORTC_PCR1 = PORT_PCR_MUX(0x1);
+	PORTC_PCR2 = PORT_PCR_MUX(0x1);
+	PORTC_PCR3 = PORT_PCR_MUX(0x1);
+	PORTC_PCR4 = PORT_PCR_MUX(0x1);
+	PORTC_PCR5 = PORT_PCR_MUX(0x1);
+	PORTC_PCR6 = PORT_PCR_MUX(0x1);
+	PORTC_PCR7 = PORT_PCR_MUX(0x1);
+	
+	GPIOC_PCOR = 0;
+	GPIOC_PSOR = 0;
+	
+	GPIOC_PDDR |= 0b11111111;
+	
 }
 
 
@@ -197,15 +189,8 @@ void Adafruit_ILI9341_8bit_STM::setReadDataBus(void) {
 
 
   // not required to mask and assign, because all pins of bus are set together
-
-	pinMode(D0, INPUT);
-	pinMode(D1, INPUT);
-	pinMode(D2, INPUT);
-	pinMode(D3, INPUT);
-	pinMode(D4, INPUT);
-	pinMode(D5, INPUT);
-	pinMode(D6, INPUT);
-	pinMode(D7, INPUT);
+  
+  GPIOC_PDDR &= 0xFFFFFF00;
 
 
 
@@ -261,14 +246,8 @@ void Adafruit_ILI9341_8bit_STM::write8(uint8_t c) {
 
 
 
-	digitalWriteFast(D0, bitRead(c, 0) ? HIGH: LOW);
-	digitalWriteFast(D1, bitRead(c, 1) ? HIGH: LOW);
-	digitalWriteFast(D2, bitRead(c, 2) ? HIGH: LOW);
-	digitalWriteFast(D3, bitRead(c, 3) ? HIGH: LOW);
-	digitalWriteFast(D4, bitRead(c, 4) ? HIGH: LOW);
-	digitalWriteFast(D5, bitRead(c, 5) ? HIGH: LOW);
-	digitalWriteFast(D6, bitRead(c, 6) ? HIGH: LOW);
-	digitalWriteFast(D7, bitRead(c, 7) ? HIGH: LOW);
+	GPIOC_PSOR = c;
+	GPIOC_PCOR = ~c;
 
 
   //TFT_DATA->regs->ODR = ((TFT_DATA->regs->ODR & 0xFF00) | ((c) & 0x00FF));//FF00 is Binary 1111111100000000
@@ -276,15 +255,8 @@ void Adafruit_ILI9341_8bit_STM::write8(uint8_t c) {
 
 
   WR_STROBE();
-  
-  	digitalWriteFast(D0, LOW);
-	digitalWriteFast(D1, LOW);
-	digitalWriteFast(D2, LOW);
-	digitalWriteFast(D3, LOW);
-	digitalWriteFast(D4, LOW);
-	digitalWriteFast(D5, LOW);
-	digitalWriteFast(D6, LOW);
-	digitalWriteFast(D7, LOW);
+
+	GPIOC_PCOR = 0b11111111;
 
 
 
