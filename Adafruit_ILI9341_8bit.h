@@ -1,21 +1,48 @@
 /*
 
+This is a library for the Teensy 3.2 (but any Teensy 3.0 through Teensy 3.6 will work).
 
+How to connect:
 
-See rights and use declaration in License.h
+First find the pins for PORTC bits 0 through 7. These pins can be found for all Teensys at https://www.pjrc.com/teensy/schematic.html in the schematics.
 
+Connect the pins for PORTC bits 0 through 7 to the LCD data bits 0 through 7.
 
+For the Teensy 3.2 this means that:
+LCD_D0 = digital pin 15 (PORTC bit 0)
+LCD_D1 = digital pin 22 (PORTC bit 1)
+LCD_D2 = digital pin 23 (PORTC bit 2)
+LCD_D3 = digital pin 9  (PORTC bit 3)
+LCD_D4 = digital pin 10 (PORTC bit 4)
+LCD_D5 = digital pin 13 (PORTC bit 5)
+LCD_D6 = digital pin 11 (PORTC bit 6)
+LCD_D7 = digital pin 12 (PORTC bit 7)
 
-This library has been modified for the Maple Mini
+The LCD Control Pins are connected in the following way:
+TFT_RD         = digital pin 21
+TFT_WR         = digital pin 20
+TFT_RS         = digital pin 19
+TFT_CS         = digital pin 18
+TFT_RST        = digital pin 17
 
+Run sketch.ino to test the ILI9341 display.
 
+Here are the benchmark results:
+Benchmark Time (microseconds)
+Screen fill 88319
+Text 12309
+Lines 87538
+Horiz/Vert Lines 7062
+Rectangles (outline) 4670
+Rectangles (filled) 183556
+Circles (filled) 35540
+Circles (outline) 35868
+Triangles (outline) 27423
+Triangles (filled) 62862
+Rounded rects (outline) 14888
+Rounded rects (filled) 200625
 
 */
-
-
-
-
-
 
 
 #ifndef _ADAFRUIT_ILI9341H_
@@ -379,31 +406,6 @@ Define pins and Output Data Registers
 */
 
 
-
-
-
-
-
-//Port data |D7 |D6 |D5 |D4 |D3 |D2 |D1 |D0 |
-
-
-
-//Pin stm32 |PA7|PA6|PA5|PA4|PA3|PA2|PC1|PA0|
-
-
-
-//Control pins |RD |WR |RS |CS |RST|
-
-
-
-//Pin stm32    |PB4|PB5|PB6|PB7|PB8|
-
-
-
-// #define TFT_CNTRL      GPIOC_PSOR
-
-
-
 #define TFT_DATA       GPIOC_PSOR
 
 
@@ -428,58 +430,17 @@ Define pins and Output Data Registers
 
 
 
-/*
 
-#define TFT_RD_MASK    digitalPinToBitMask(TFT_RD)
+#define RD_IDLE  	  digitalWriteFast(TFT_RD, HIGH)
+#define RD_ACTIVE     digitalWriteFast(TFT_RD, LOW)
+#define WR_IDLE       digitalWriteFast(TFT_WR, HIGH)
+#define WR_ACTIVE     digitalWriteFast(TFT_WR, LOW)
+#define CD_COMMAND    digitalWriteFast(TFT_RS, LOW)
+#define CD_DATA       digitalWriteFast(TFT_RS, HIGH)
+#define CS_IDLE       digitalWriteFast(TFT_CS, HIGH)
+#define CS_ACTIVE     digitalWriteFast(TFT_CS, LOW)
 
-
-
-#define TFT_WR_MASK    digitalPinToBitMask(TFT_WR)
-
-
-
-#define TFT_RS_MASK    digitalPinToBitMask(TFT_RS)
-
-
-
-#define TFT_CS_MASK    digitalPinToBitMask(TFT_CS)
-
-*/
-
-
-
-
-
-#define RD_IDLE    digitalWriteFast(TFT_RD, HIGH)
-
-
-
-#define RD_ACTIVE      digitalWriteFast(TFT_RD, LOW)
-
-
-
-#define WR_IDLE    digitalWriteFast(TFT_WR, HIGH)
-
-
-
-#define WR_ACTIVE      digitalWriteFast(TFT_WR, LOW)
-
-
-
-#define CD_COMMAND   digitalWriteFast(TFT_RS, LOW)
-
-
-
-#define CD_DATA      digitalWriteFast(TFT_RS, HIGH)
-
-
-
-#define CS_IDLE    digitalWriteFast(TFT_CS, HIGH)
-
-
-
-#define CS_ACTIVE      digitalWriteFast(TFT_CS, LOW)
-
+// If you are not using Teensy 3.2 change these pins!
 #define D0 15
 #define D1 22
 #define D2 23
@@ -488,16 +449,6 @@ Define pins and Output Data Registers
 #define D5 13
 #define D6 11
 #define D7 12
-
-
-
-
-//Set pins to the 8 bit number
-
-
-
-
-
 
 
 class Adafruit_ILI9341_8bit_STM : public Adafruit_GFX {
@@ -537,19 +488,6 @@ class Adafruit_ILI9341_8bit_STM : public Adafruit_GFX {
 
 
            fillScreen(uint16_t color),
-
-
-
-		   #if defined (__STM32F1__)
-
-
-
-		   drawLine(int16_t x0, int16_t y0,int16_t x1, int16_t y1, uint16_t color),
-
-
-
-		   #endif
-
 
 
            drawPixel(int16_t x, int16_t y, uint16_t color),
@@ -637,40 +575,7 @@ class Adafruit_ILI9341_8bit_STM : public Adafruit_GFX {
 
 
 
-    writedata(uint8_t d),
-
-
-
-    commandList(uint8_t *addr);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#if defined (__STM32F1__)
-
-
-
-	 uint16_t lineBuffer[ILI9341_TFTHEIGHT]; // DMA buffer. 16bit color data per pixel
-
-
-
-#endif
-
+    writedata(uint8_t d);
 
 
 };
