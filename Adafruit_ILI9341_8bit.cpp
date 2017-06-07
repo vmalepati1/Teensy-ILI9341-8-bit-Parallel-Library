@@ -1,19 +1,5 @@
 /*
-
-
-
-See rights and use declaration in License.h
-
-
-
-This library has been modified for the Maple Mini.
-
-
-
-Includes DMA transfers on DMA1 CH2 and CH3.
-
-
-
+	Uses hardware registers for fast speed.
 */
 
 
@@ -31,20 +17,14 @@ void WR_STROBE() {WR_ACTIVE; WR_IDLE;}
 void swap(int16_t a, int16_t b) {int16_t t = a; a = b; b = t;}
 
 void write8special(uint8_t c) {
-	
 
-
-	GPIOC_PSOR = c;
-	GPIOC_PCOR = ~c;
-
-
-
-  //TFT_DATA->regs->ODR = ((TFT_DATA->regs->ODR & 0xFF00) | ((c) & 0x00FF));//FF00 is Binary 1111111100000000
-
-
-  WR_STROBE();
-  
-	GPIOC_PCOR = 0b11111111;
+	digitalWriteFast(TFT_WR, LOW);
+	*((volatile uint8_t *)(&GPIOC_PDOR)) = c;
+	digitalWriteFast(TFT_WR, HIGH);
+	asm("NOP"); // wait ten ns
+	asm("NOP");
+	asm("NOP");
+	asm("NOP");
 
 }
 
@@ -63,22 +43,6 @@ Adafruit_ILI9341_8bit_STM::Adafruit_ILI9341_8bit_STM(void)
 
 
 : Adafruit_GFX(ILI9341_TFTWIDTH, ILI9341_TFTHEIGHT) {
-
-
-
-  
-
-
-
-  //Set PB4 - PB7 as output
-
-
-
-  //Note: CRH and CRL are both 32 bits wide
-
-
-
-  //Each pin is represented by 4 bits 0x3 (hex) sets that pin to O/P
 
 
 
@@ -109,15 +73,6 @@ Adafruit_ILI9341_8bit_STM::Adafruit_ILI9341_8bit_STM(void)
 
 
   if(TFT_RST) {
-
-
-
-    //pinMode(TFT_RST, OUTPUT);
-
-
-
-    //Set PB8 as output
-
 
 
     pinMode(TFT_RST, OUTPUT);
@@ -155,22 +110,14 @@ void Adafruit_ILI9341_8bit_STM::setWriteDataBus(void) {
   // set the pins to output mode
 
 
-
-  // not required to mask and assign, because all pins of bus are set together
-
-	PORTC_PCR0 = PORT_PCR_MUX(0x1);
-	PORTC_PCR1 = PORT_PCR_MUX(0x1);
-	PORTC_PCR2 = PORT_PCR_MUX(0x1);
-	PORTC_PCR3 = PORT_PCR_MUX(0x1);
-	PORTC_PCR4 = PORT_PCR_MUX(0x1);
-	PORTC_PCR5 = PORT_PCR_MUX(0x1);
-	PORTC_PCR6 = PORT_PCR_MUX(0x1);
-	PORTC_PCR7 = PORT_PCR_MUX(0x1);
-	
-	GPIOC_PCOR = 0;
-	GPIOC_PSOR = 0;
-	
-	GPIOC_PDDR |= 0b11111111;
+	pinMode(D0, OUTPUT); 
+	pinMode(D1, OUTPUT); 
+	pinMode(D2, OUTPUT); 
+	pinMode(D3, OUTPUT); 
+	pinMode(D4, OUTPUT); 
+	pinMode(D5, OUTPUT); 
+	pinMode(D6, OUTPUT); 
+	pinMode(D7, OUTPUT); 
 	
 }
 
@@ -187,27 +134,14 @@ void Adafruit_ILI9341_8bit_STM::setReadDataBus(void) {
   //set the pins to input mode
 
 
-
-  // not required to mask and assign, because all pins of bus are set together
-  
-  GPIOC_PDDR &= 0xFFFFFF00;
-
-
-
-  //8 in hex is 0b1000, which means input, same as pinmode()
-
-
-
-  // for (uint8_t i = 0; i <= 7; i++){
-
-
-
-  //   pinMode(DPINS[i], INPUT);
-
-
-
-  // }
-
+  	pinMode(D0, INPUT); 
+	pinMode(D1, INPUT); 
+	pinMode(D2, INPUT); 
+	pinMode(D3, INPUT); 
+	pinMode(D4, INPUT); 
+	pinMode(D5, INPUT); 
+	pinMode(D6, INPUT); 
+	pinMode(D7, INPUT); 
 
 
 }
@@ -219,54 +153,20 @@ void Adafruit_ILI9341_8bit_STM::setReadDataBus(void) {
 
 
 void Adafruit_ILI9341_8bit_STM::write8(uint8_t c) {
-
-
-
-
-
-
-
-  //retain values of A8-A15, and update A0-A7
-
-
-
   CS_ACTIVE;
 
 
 
-  //BRR or BSRR avoid read, mask write cycle time
-
-
-
-  //BSRR is 32 bits wide. 1's in the most significant 16 bits signify pins to reset (clear)
-
-
-
-  // 1's in least significant 16 bits signify pins to set high. 0's mean 'do nothing'
-
-
-
-	GPIOC_PSOR = c;
-	GPIOC_PCOR = ~c;
-
-
-  //TFT_DATA->regs->ODR = ((TFT_DATA->regs->ODR & 0xFF00) | ((c) & 0x00FF));//FF00 is Binary 1111111100000000
-
-
-
-  WR_STROBE();
-
-	GPIOC_PCOR = 0b11111111;
-
-
+	digitalWriteFast(TFT_WR, LOW);
+	*((volatile uint8_t *)(&GPIOC_PDOR)) = c;
+	digitalWriteFast(TFT_WR, HIGH);
+	asm("NOP"); // wait ten ns
+	asm("NOP");
+	asm("NOP");
+	asm("NOP");
+		
 
   CS_IDLE;
-
-
-
-  //delayMicroseconds(50); //used to observe patterns
-
-
 
 }
 
@@ -321,146 +221,6 @@ void Adafruit_ILI9341_8bit_STM::writedata(uint8_t c) {
 
 
 }
-
-
-
-
-
-
-
-// Rather than a bazillion writecommand() and writedata() calls, screen
-
-
-
-// initialization commands and arguments are organized in these tables
-
-
-
-// stored in PROGMEM.  The table may look bulky, but that's mostly the
-
-
-
-// formatting -- storage-wise this is hundreds of bytes more compact
-
-
-
-// than the equivalent code.  Companion function follows.
-
-
-
-#define DELAY 0x80
-
-
-
-
-
-
-
-
-
-
-
-// Companion code to the above tables.  Reads and issues
-
-
-
-// a series of LCD commands stored in PROGMEM byte array.
-
-
-
-void Adafruit_ILI9341_8bit_STM::commandList(uint8_t *addr) {
-
-
-
-
-
-
-
-  uint8_t  numCommands, numArgs;
-
-
-
-  uint16_t ms;
-
-
-
-
-
-
-
-  numCommands = pgm_read_byte(addr++);   // Number of commands to follow
-
-
-
-  while (numCommands--) {                // For each command...
-
-
-
-    writecommand(pgm_read_byte(addr++)); //   Read, issue command
-
-
-
-    numArgs  = pgm_read_byte(addr++);    //   Number of args to follow
-
-
-
-    ms       = numArgs & DELAY;          //   If hibit set, delay follows args
-
-
-
-    numArgs &= ~DELAY;                   //   Mask out delay bit
-
-
-
-    while (numArgs--) {                  //   For each argument...
-
-
-
-      writedata(pgm_read_byte(addr++));  //     Read, issue argument
-
-
-
-    }
-
-
-
-
-
-
-
-    if (ms) {
-
-
-
-      ms = pgm_read_byte(addr++); // Read post-command delay time (ms)
-
-
-
-      if (ms == 255) ms = 500;    // If 255, delay for 500 ms
-
-
-
-      delay(ms);
-
-
-
-    }
-
-
-
-  }
-
-
-
-}
-
-
-
-
-
-
-
-
 
 
 
@@ -1446,472 +1206,6 @@ void Adafruit_ILI9341_8bit_STM::fillRect(int16_t x, int16_t y, int16_t w, int16_
 
 }
 
-
-
-
-
-
-
-/*
-
-
-
-* Draw lines faster by calculating straight sections and drawing them with fastVline and fastHline.
-
-
-
-*/
-
-
-
-#if defined (__STM32F1__)
-
-
-
-void Adafruit_ILI9341_8bit_STM::drawLine(int16_t x0, int16_t y0,int16_t x1, int16_t y1, uint16_t color)
-
-
-
-{
-
-
-
-	if ((y0 < 0 && y1 <0) || (y0 > _height && y1 > _height)) return;
-
-
-
-	if ((x0 < 0 && x1 <0) || (x0 > _width && x1 > _width)) return;
-
-
-
-	if (x0 < 0) x0 = 0;
-
-
-
-	if (x1 < 0) x1 = 0;
-
-
-
-	if (y0 < 0) y0 = 0;
-
-
-
-	if (y1 < 0) y1 = 0;
-
-
-
-
-
-
-
-	if (y0 == y1) {
-
-
-
-		if (x1 > x0) {
-
-
-
-			drawFastHLine(x0, y0, x1 - x0 + 1, color);
-
-
-
-		}
-
-
-
-		else if (x1 < x0) {
-
-
-
-			drawFastHLine(x1, y0, x0 - x1 + 1, color);
-
-
-
-		}
-
-
-
-		else { //x0==x1 and y0==y1
-
-
-
-			drawPixel(x0, y0, color);
-
-
-
-		}
-
-
-
-		return;
-
-
-
-	}
-
-
-
-	else if (x0 == x1) {
-
-
-
-		if (y1 > y0) {
-
-
-
-			drawFastVLine(x0, y0, y1 - y0 + 1, color);
-
-
-
-		}
-
-
-
-		else {
-
-
-
-			drawFastVLine(x0, y1, y0 - y1 + 1, color);
-
-
-
-		}
-
-
-
-		return;
-
-
-
-	}
-
-
-
-
-
-
-
-	bool steep = abs(y1 - y0) > abs(x1 - x0);
-
-
-
-	if (steep) {
-
-
-
-		swap();();(x0, y0);
-
-
-
-		swap();();(x1, y1);
-
-
-
-	}
-
-
-
-	if (x0 > x1) {
-
-
-
-		swap();();(x0, x1);
-
-
-
-		swap();();(y0, y1);
-
-
-
-	}
-
-
-
-
-
-
-
-	int16_t dx, dy;
-
-
-
-	dx = x1 - x0;
-
-
-
-	dy = abs(y1 - y0);
-
-
-
-
-
-
-
-	int16_t err = dx / 2;
-
-
-
-	int16_t ystep;
-
-
-
-
-
-
-
-	if (y0 < y1) {
-
-
-
-		ystep = 1;
-
-
-
-	}
-
-
-
-	else {
-
-
-
-		ystep = -1;
-
-
-
-	}
-
-
-
-
-
-
-
-	int16_t xbegin = x0;
-
-
-
-	lineBuffer[0] = color;
-
-
-
-	//*csport &= ~cspinmask;
-
-
-
-	if (steep) {
-
-
-
-		for (; x0 <= x1; x0++) {
-
-
-
-			err -= dy;
-
-
-
-			if (err < 0) {
-
-
-
-				int16_t len = x0 - xbegin;
-
-
-
-				if (len) {
-
-
-
-					drawFastVLine (y0, xbegin, len + 1, color);
-
-
-
-					//writeVLine_cont_noCS_noFill(y0, xbegin, len + 1);
-
-
-
-				}
-
-
-
-				else {
-
-
-
-					drawPixel(y0, x0, color);
-
-
-
-					//writePixel_cont_noCS(y0, x0, color);
-
-
-
-				}
-
-
-
-				xbegin = x0 + 1;
-
-
-
-				y0 += ystep;
-
-
-
-				err += dx;
-
-
-
-			}
-
-
-
-		}
-
-
-
-		if (x0 > xbegin + 1) {
-
-
-
-			//writeVLine_cont_noCS_noFill(y0, xbegin, x0 - xbegin);
-
-
-
-			drawFastVLine(y0, xbegin, x0 - xbegin, color);
-
-
-
-		}
-
-
-
-
-
-
-
-	}
-
-
-
-	else {
-
-
-
-		for (; x0 <= x1; x0++) {
-
-
-
-			err -= dy;
-
-
-
-			if (err < 0) {
-
-
-
-				int16_t len = x0 - xbegin;
-
-
-
-				if (len) {
-
-
-
-					drawFastHLine(xbegin, y0, len + 1, color);
-
-
-
-					//writeHLine_cont_noCS_noFill(xbegin, y0, len + 1);
-
-
-
-				}
-
-
-
-				else {
-
-
-
-					drawPixel(x0, y0, color);
-
-
-
-					//writePixel_cont_noCS(x0, y0, color);
-
-
-
-				}
-
-
-
-				xbegin = x0 + 1;
-
-
-
-				y0 += ystep;
-
-
-
-				err += dx;
-
-
-
-			}
-
-
-
-		}
-
-
-
-		if (x0 > xbegin + 1) {
-
-
-
-			//writeHLine_cont_noCS_noFill(xbegin, y0, x0 - xbegin);
-
-
-
-			drawFastHLine(xbegin, y0, x0 - xbegin, color);
-
-
-
-		}
-
-
-
-	}
-
-
-
-	//*csport |= cspinmask;
-
-
-
-}
-
-
-
-#endif
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 // Pass 8-bit (each) R,G,B, get back 16-bit packed color
 
 
@@ -2130,21 +1424,21 @@ uint8_t Adafruit_ILI9341_8bit_STM::read8(void){
 
   uint8_t temp = 0;
 
-  if(digitalReadFast(15)) {temp |= (1 << 0);}
+  if(digitalReadFast(D0)) {temp |= (1 << 0);} // slow reading but works
 
-  if(digitalReadFast(22)) {temp |= (1 << 1);}
+  if(digitalReadFast(D1)) {temp |= (1 << 1);}
 
-  if(digitalReadFast(23)) {temp |= (1 << 2);}
+  if(digitalReadFast(D2)) {temp |= (1 << 2);}
 
-  if(digitalReadFast(9)) {temp |= (1 << 3);}
+  if(digitalReadFast(D3)) {temp |= (1 << 3);}
 
-  if(digitalReadFast(10)) {temp |= (1 << 4);}
+  if(digitalReadFast(D4)) {temp |= (1 << 4);}
 
-  if(digitalReadFast(13)) {temp |= (1 << 5);}
+  if(digitalReadFast(D5)) {temp |= (1 << 5);}
 
-  if(digitalReadFast(11)) {temp |= (1 << 6);}
+  if(digitalReadFast(D6)) {temp |= (1 << 6);}
 
-  if(digitalReadFast(12)) {temp |= (1 << 7);}
+  if(digitalReadFast(D7)) {temp |= (1 << 7);}
 
   RD_IDLE;
 
